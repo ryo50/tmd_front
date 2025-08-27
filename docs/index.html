@@ -3,17 +3,45 @@
   <head>
     <meta charset="UTF-8" />
     <title>動画ダウンロード</title>
+    <style>
+      /* くるくるローディング */
+      #spinner {
+        display: none;
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        margin: -20px 0 0 -20px;
+        z-index: 999;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
     <input type="text" id="targetUrl" placeholder="ページURLを入力" />
     <button id="downloadBtn">ダウンロード</button>
-
+    <div id="spinner"></div>
     <script>
       document
         .getElementById('downloadBtn')
         .addEventListener('click', async () => {
           const targetUrl = document.getElementById('targetUrl').value
           if (!targetUrl) return alert('URLを入力してください')
+
+          const spinner = document.getElementById('spinner')
+          spinner.style.display = 'block' // くるくる開始
 
           try {
             const proxyUrl = `https://tmd-wb30.onrender.com/download?target=${encodeURIComponent(
@@ -23,6 +51,21 @@
             if (!res.ok) throw new Error('ダウンロード失敗')
 
             const blob = await res.blob()
+
+            // 元動画URLからファイル名を取得
+            const videoUrl = res.url // ここはプロキシURLなので元URLを返すようRender側を少し修正する必要あり
+            // もしくはプロキシでヘッダーでファイル名を返す
+            let filename = 'video.mp4'
+            const contentDisposition = res.headers.get('Content-Disposition')
+            if (
+              contentDisposition &&
+              contentDisposition.includes('filename=')
+            ) {
+              filename = contentDisposition
+                .split('filename=')[1]
+                .replace(/"/g, '')
+            }
+
             const a = document.createElement('a')
             a.href = URL.createObjectURL(blob)
             a.download = 'video.mp4'
@@ -31,6 +74,8 @@
           } catch (err) {
             console.error(err)
             alert('エラーが発生しました')
+          } finally {
+            spinner.style.display = 'none' // くるくる終了
           }
         })
     </script>
