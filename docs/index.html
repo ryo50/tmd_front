@@ -68,7 +68,7 @@
 
             const a = document.createElement('a')
             a.href = URL.createObjectURL(blob)
-            a.download = 'video.mp4'
+            a.download = filename
             a.click()
             a.remove()
           } catch (err) {
