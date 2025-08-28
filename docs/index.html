@@ -165,6 +165,8 @@
             // ファイル名取得
             let filename = 'video.mp4'
             const contentDisposition = res.headers.get('Content-Disposition')
+            console.log(contentDisposition)
+            console.log(contentDisposition.includes('filename='))
             if (
               contentDisposition &&
               contentDisposition.includes('filename=')
