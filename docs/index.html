@@ -147,13 +147,14 @@
       const tasksEl = document.getElementById('tasks')
       const addTaskBtn = document.getElementById('addTaskBtn')
 
-      function createTask() {
+      function createTask(url) {
         const taskEl = document.createElement('div')
         taskEl.className = 'task'
 
         const input = document.createElement('input')
         input.type = 'text'
         input.placeholder = 'URLを入力'
+        input.value = url || '' // ← ここで引数のURLをセット
 
         const downloadBtn = document.createElement('button')
         downloadBtn.textContent = 'ダウンロード'
@@ -260,7 +261,7 @@
             }
 
             urls.forEach((url) => {
-              addDownloadRow(url) // 既存の「欄追加関数」を呼ぶ
+              createTask(url) // 既存の「欄追加関数」を呼ぶ
             })
           } catch (err) {
             console.error('クリップボード読み取り失敗:', err)
