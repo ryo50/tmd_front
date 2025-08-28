@@ -89,6 +89,22 @@
         opacity: 0.9;
       }
 
+      #addFromClipboard {
+        display: block;
+        width: 100%;
+        padding: 16px;
+        background: #2ecc71;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        margin-top: 14px;
+        cursor: pointer;
+      }
+      #addFromClipboard:hover {
+        opacity: 0.9;
+      }
+
       /* ✅ スマホ対応 */
       @media (max-width: 600px) {
         .task {
@@ -113,6 +129,18 @@
       <button id="addTaskBtn">＋ 追加</button>
 
       <button id="addFromClipboard">📋 クリップボードから追加</button>
+
+      <pre
+        id="debugLog"
+        style="
+          background: #f0f0f0;
+          padding: 10px;
+          font-size: 12px;
+          max-height: 150px;
+          overflow-y: auto;
+          border: 1px solid #ccc;
+        "
+      ></pre>
     </div>
 
     <script>
@@ -239,8 +267,14 @@
             alert(
               'クリップボードを読み取れませんでした。HTTPS環境か確認してください。'
             )
+            logDebug("Clipboard read error: " + err.message);
           }
         })
+
+      function logDebug(msg) {
+        const el = document.getElementById('debugLog')
+        el.textContent += msg + '\n'
+      }
     </script>
   </body>
 </html>
