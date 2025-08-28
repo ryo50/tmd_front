@@ -2,22 +2,34 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <title>動画ダウンロード</title>
+    <title>動画ダウンロードマネージャー</title>
     <style>
-      /* くるくるローディング */
-      #spinner {
-        display: none;
-        border: 6px solid #f3f3f3;
-        border-top: 6px solid #3498db;
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        font-family: sans-serif;
+      }
+      .task {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .task input {
+        flex: 1;
+        padding: 5px;
+      }
+      .task button {
+        margin-left: 5px;
+        padding: 5px 10px;
+      }
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
         border-radius: 50%;
-        width: 40px;
-        height: 40px;
+        width: 20px;
+        height: 20px;
         animation: spin 1s linear infinite;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        margin: -20px 0 0 -20px;
-        z-index: 999;
+        margin-left: 10px;
       }
       @keyframes spin {
         0% {
@@ -27,21 +39,54 @@
           transform: rotate(360deg);
         }
       }
+      .status {
+        margin-left: 10px;
+      }
     </style>
   </head>
   <body>
-    <input type="text" id="targetUrl" placeholder="ページURLを入力" />
-    <button id="downloadBtn">ダウンロード</button>
-    <div id="spinner"></div>
+    <div class="container">
+      <div id="tasks"></div>
+      <button id="addTaskBtn">＋</button>
+    </div>
+
     <script>
-      document
-        .getElementById('downloadBtn')
-        .addEventListener('click', async () => {
-          const targetUrl = document.getElementById('targetUrl').value
+      const tasksEl = document.getElementById('tasks')
+      const addTaskBtn = document.getElementById('addTaskBtn')
+
+      function createTask() {
+        const taskEl = document.createElement('div')
+        taskEl.className = 'task'
+
+        const input = document.createElement('input')
+        input.type = 'text'
+        input.placeholder = 'URLを入力'
+
+        const downloadBtn = document.createElement('button')
+        downloadBtn.textContent = 'ダウンロード'
+
+        const removeBtn = document.createElement('button')
+        removeBtn.textContent = '×'
+
+        const statusEl = document.createElement('span')
+        statusEl.className = 'status'
+
+        taskEl.appendChild(input)
+        taskEl.appendChild(downloadBtn)
+        taskEl.appendChild(removeBtn)
+        taskEl.appendChild(statusEl)
+        tasksEl.appendChild(taskEl)
+
+        // ダウンロード処理
+        downloadBtn.addEventListener('click', async () => {
+          const targetUrl = input.value.trim()
           if (!targetUrl) return alert('URLを入力してください')
 
-          const spinner = document.getElementById('spinner')
-          spinner.style.display = 'block' // くるくる開始
+          // UI更新: ローディング開始
+          statusEl.innerHTML = ''
+          const spinner = document.createElement('div')
+          spinner.className = 'spinner'
+          statusEl.appendChild(spinner)
 
           try {
             const proxyUrl = `https://tmd-wb30.onrender.com/download?target=${encodeURIComponent(
@@ -52,9 +97,7 @@
 
             const blob = await res.blob()
 
-            // 元動画URLからファイル名を取得
-            const videoUrl = res.url // ここはプロキシURLなので元URLを返すようRender側を少し修正する必要あり
-            // もしくはプロキシでヘッダーでファイル名を返す
+            // Render側が Content-Disposition にファイル名を返す前提
             let filename = 'video.mp4'
             const contentDisposition = res.headers.get('Content-Disposition')
             if (
@@ -66,18 +109,31 @@
                 .replace(/"/g, '')
             }
 
+            // 保存
             const a = document.createElement('a')
             a.href = URL.createObjectURL(blob)
             a.download = filename
             a.click()
-            a.remove()
+
+            // UI更新: 完了
+            statusEl.innerHTML = '✅ 完了'
           } catch (err) {
             console.error(err)
-            alert('エラーが発生しました')
-          } finally {
-            spinner.style.display = 'none' // くるくる終了
+            statusEl.innerHTML = '❌ 失敗'
           }
         })
+
+        // 削除処理
+        removeBtn.addEventListener('click', () => {
+          tasksEl.removeChild(taskEl)
+        })
+      }
+
+      // 初期タスクを1つ作成
+      createTask()
+
+      // ＋ボタン押下時
+      addTaskBtn.addEventListener('click', createTask)
     </script>
   </body>
 </html>
