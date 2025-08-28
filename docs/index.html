@@ -166,7 +166,9 @@
             let filename = 'video.mp4'
             const contentDisposition = res.headers.get('content-disposition')
             console.log(contentDisposition)
-            console.log(res.headers)
+            res.headers.forEach(element => {
+              console.log(element)
+            });
             if (
               contentDisposition &&
               contentDisposition.includes('filename=')
