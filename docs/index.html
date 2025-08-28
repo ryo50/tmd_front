@@ -111,6 +111,8 @@
     <div class="container">
       <div id="tasks"></div>
       <button id="addTaskBtn">＋ 追加</button>
+
+      <button id="addFromClipboard">📋 クリップボードから追加</button>
     </div>
 
     <script>
@@ -183,7 +185,6 @@
             const proxyUrl = `https://tmd-wb30.onrender.com/download?target=${encodeURIComponent(
               targetUrl
             )}`
-            // const proxyUrl = `https://tmd-wb30.onrender.com/download?target=${targetUrl}`
 
             const a = document.createElement('a')
             a.href = proxyUrl
@@ -211,6 +212,35 @@
 
       // ＋ボタン押下時
       addTaskBtn.addEventListener('click', createTask)
+
+      document
+        .getElementById('addFromClipboard')
+        .addEventListener('click', async () => {
+          try {
+            const text = await navigator.clipboard.readText()
+            if (!text) {
+              alert('クリップボードにURLが見つかりませんでした')
+              return
+            }
+
+            // 改行・スペース区切りで分割
+            const urls = text.split(/\s+/).filter((u) => u.startsWith('http'))
+
+            if (urls.length === 0) {
+              alert('クリップボードに有効なURLが見つかりませんでした')
+              return
+            }
+
+            urls.forEach((url) => {
+              addDownloadRow(url) // 既存の「欄追加関数」を呼ぶ
+            })
+          } catch (err) {
+            console.error('クリップボード読み取り失敗:', err)
+            alert(
+              'クリップボードを読み取れませんでした。HTTPS環境か確認してください。'
+            )
+          }
+        })
     </script>
   </body>
 </html>
