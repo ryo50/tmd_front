@@ -154,31 +154,43 @@
           statusEl.appendChild(spinner)
 
           try {
-            const proxyUrl = `https://tmd-wb30.onrender.com/download?target=${encodeURIComponent(
-              targetUrl
-            )}`
-            const res = await fetch(proxyUrl)
-            if (!res.ok) throw new Error('ダウンロード失敗')
+            // const proxyUrl = `https://tmd-wb30.onrender.com/download?target=${encodeURIComponent(
+            //   targetUrl
+            // )}`
+            // const res = await fetch(proxyUrl)
+            // if (!res.ok) throw new Error('ダウンロード失敗')
 
-            const blob = await res.blob()
+            // const blob = await res.blob()
 
-            // ファイル名取得
-            let filename = 'video.mp4'
-            const contentDisposition = res.headers.get('content-disposition')
-            if (
-              contentDisposition &&
-              contentDisposition.includes('filename=')
-            ) {
-              filename = contentDisposition
-                .split('filename=')[1]
-                .replace(/"/g, '')
-            }
+            // // ファイル名取得
+            // let filename = 'video.mp4'
+            // const contentDisposition = res.headers.get('content-disposition')
+            // if (
+            //   contentDisposition &&
+            //   contentDisposition.includes('filename=')
+            // ) {
+            //   filename = contentDisposition
+            //     .split('filename=')[1]
+            //     .replace(/"/g, '')
+            // }
 
-            // 保存
+            // // 保存
+            // const a = document.createElement('a')
+            // a.href = URL.createObjectURL(blob)
+            // a.download = filename
+            // a.click()
+
+            // const proxyUrl = `https://tmd-wb30.onrender.com/download?target=${encodeURIComponent(
+            //   targetUrl
+            // )}`
+            const proxyUrl = `https://tmd-wb30.onrender.com/download?target=${targetUrl}`
+
             const a = document.createElement('a')
-            a.href = URL.createObjectURL(blob)
-            a.download = filename
+            a.href = proxyUrl
+            a.download = '' // ← サーバー側の Content-Disposition に任せる
+            document.body.appendChild(a)
             a.click()
+            a.remove()
 
             // UI更新: 完了
             statusEl.innerHTML = '✅ 完了'
